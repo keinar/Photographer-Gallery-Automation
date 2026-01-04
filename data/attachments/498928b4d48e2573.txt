@@ -1,0 +1,2 @@
+[2026-01-04T17:58:56.580Z] [INFO] Maps to URL: '/dashboard'
+[2026-01-04T17:58:57.707Z] [INFO] Assert 'locator('#createGalleryButton')' is visible
