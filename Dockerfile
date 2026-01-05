@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y default-jre && \
 
 WORKDIR /app
 
+ENV BASE_URL=http://localhost:4200
+ENV ADMIN_USER=default@admin.com
+ENV ADMIN_PASS=default_pass
+
 COPY package.json package-lock.json ./
 RUN npm install --legacy-peer-deps
 
