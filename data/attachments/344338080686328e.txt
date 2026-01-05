@@ -1,0 +1,2 @@
+[2026-01-05T07:23:46.035Z] [INFO] Maps to URL: '/dashboard'
+[Mock API] Intercepted /api/galleries, returning 500 error.

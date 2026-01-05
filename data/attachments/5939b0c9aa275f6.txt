@@ -1,0 +1,10 @@
+[2026-01-05T07:24:10.239Z] [INFO] Maps to URL: 'https://photo-gallery.keinar.com/profile'
+[AI Fuzzing] Generated inputs for "Usernames containing XSS and SQL injection": ["<script>alert('XSS')</script>", "'; DROP TABLE users; --", "SELECT * FROM users WHERE username = 'admin'--"]
+[Fuzz Test] Input: "<script>alert('XSS')</script>"
+[2026-01-05T07:24:12.404Z] [INFO] Maps to URL: 'https://photo-gallery.keinar.com/profile'
+[Fuzz Test] Input: "'; DROP TABLE users; --"
+[2026-01-05T07:24:13.231Z] [INFO] Maps to URL: 'https://photo-gallery.keinar.com/profile'
+[Fuzz Test] Input: "SELECT * FROM users WHERE username = 'admin'--"
+[2026-01-05T07:24:13.996Z] [INFO] Maps to URL: 'https://photo-gallery.keinar.com/profile'
+[Teardown] Restoring profile...
+[2026-01-05T07:24:14.914Z] [INFO] API PUT Request: /api/users/profile
