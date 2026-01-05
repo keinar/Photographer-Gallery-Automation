@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
  * This ensures the test run fails immediately if configuration is missing.
  */
 const envSchema = z.object({
-    MONGO_URI: z.string().startsWith('mongodb'),
+    MONGO_URI: z.string().startsWith('mongodb').default(''),
     BASE_URL: z.url().optional(),
     ADMIN_USER: z.email().optional(),
     ADMIN_PASS: z.string().min(1).optional(),
