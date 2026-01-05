@@ -105,8 +105,8 @@ jobs:
 
       - name: Restore history from gh-pages
         run: |
-          echo "🔍 Starting history restoration..."
-          git fetch origin gh-pages || echo "⚠️ Could not fetch gh-pages"
+          echo "Starting history restoration..."
+          git fetch origin gh-pages || echo "Could not fetch gh-pages"
           if git ls-tree -r origin/gh-pages --name-only | grep -q "^history/"; then
             git checkout origin/gh-pages -- history
             mkdir -p allure-results/history
@@ -133,10 +133,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
-              body: `📊 **Allure Report is ready!**\n\n🔗 ${reportUrl}`
+              body: `**Allure Report is ready!**\n\n ${reportUrl}`
             });
 
       - name: Add Action Summary
         run: |
-          echo "## 📊 Allure Report" >> $GITHUB_STEP_SUMMARY
-          echo "🔗 **https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**" >> $GITHUB_STEP_SUMMARY
+          echo "## Allure Report" >> $GITHUB_STEP_SUMMARY
+          echo "**https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**" >> $GITHUB_STEP_SUMMARY
