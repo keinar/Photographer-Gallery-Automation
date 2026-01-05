@@ -23,8 +23,10 @@ COPY pages ./pages
 COPY fixtures ./fixtures
 COPY services ./services
 COPY repositories ./repositories
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
 
 # Create a directory for results
 RUN mkdir -p /app/results
 
-CMD ["npx", "playwright", "test", "--output=/app/results"]
+CMD ["./entrypoint.sh", "all"]
