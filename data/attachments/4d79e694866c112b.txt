@@ -1,0 +1,2 @@
+[2026-01-05T10:49:14.705Z] [INFO] Maps to URL: '/dashboard'
+[Mock API] Intercepted /api/galleries, returning empty array.
