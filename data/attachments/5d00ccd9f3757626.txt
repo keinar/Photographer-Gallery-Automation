@@ -1,2 +1,0 @@
-[2026-01-04T17:59:15.720Z] [INFO] Maps to URL: '/dashboard'
-[2026-01-04T17:59:16.845Z] [INFO] Click 'getByRole('button', { name: 'Logout' })'
