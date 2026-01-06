@@ -1,7 +1,7 @@
 # 🎭 Playwright Full-Stack Automation Framework
 
-[![Playwright CI](https://github.com/keinar/Playwright-Full-Stack-Framework/actions/workflows/playwright.yml/badge.svg)](https://github.com/keinar/Playwright-Full-Stack-Framework/actions/workflows/playwright.yml)
-[![Allure Report](https://img.shields.io/badge/Allure_Report-View_Report-blue?style=flat\&logo=allure)](https://keinar.github.io/Playwright-Full-Stack-Framework/)
+[![Playwright CI](https://github.com/keinar/Photographer-Gallery-Automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/keinar/Photographer-Gallery-Automation/actions/workflows/playwright.yml)
+[![Allure Report](https://img.shields.io/badge/Allure_Report-View_Report-blue?style=flat\&logo=allure)](https://keinar.github.io/Photographer-Gallery-Automation/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A **production-grade Quality Automation Framework** for modern full‑stack web applications.
