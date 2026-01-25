@@ -13,6 +13,7 @@ fi
 echo "🔍 Environment Check:"
 echo "   Running against BASE_URL: $BASE_URL"
 
+
 if [ -z "$FOLDER_PATH" ] || [ "$FOLDER_PATH" = "all" ]; then
     echo "▶️ Running ALL tests..."
     npx playwright test
@@ -20,3 +21,6 @@ else
     echo "▶️ Running tests in specific folder: $FOLDER_PATH"
     npx playwright test "$FOLDER_PATH"
 fi
+
+echo "📊 Generating Allure Report..."
+npx allure generate allure-results --clean -o allure-report
