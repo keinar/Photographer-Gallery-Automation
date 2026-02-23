@@ -1,4 +1,4 @@
-name: Playwright Full-Stack Tests
+name: Full-Stack Tests & AAC Integration
 
 on:
   push:
@@ -11,7 +11,6 @@ on:
       - 'README.md'
 
 jobs:
-  # Job 1: Build and Publish to Docker Hub
   publish-docker:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
@@ -40,109 +39,181 @@ jobs:
           push: true
           tags: keinar101/my-automation-tests:latest
 
-  # Job 2: Run QA Tests
-  test:
-    name: Run QA Tests (Docker)
-    timeout-minutes: 60
+  trigger-aac:
+    name: Trigger AAC Execution
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.57.0-jammy
+    if: github.event_name == 'pull_request'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run Playwright tests
-        env:
-          BASE_URL: ${{ secrets.BASE_URL }}
-          ADMIN_USER: ${{ secrets.ADMIN_USER }}
-          ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          HOME: /root
-        run: npx playwright test
-
-      - name: Upload Allure results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-results
-          path: allure-results/
-          retention-days: 3
-
-  # Job 3: Deploy Allure Report to Pages
-  deploy-report:
-    name: Deploy Allure Report to Pages
-    if: always()
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download Allure results
-        uses: actions/download-artifact@v4
-        with:
-          name: allure-results
-          path: allure-results
-
-      - name: Install Allure CLI
+      - name: Send Trigger Payload to AAC API
         run: |
-          sudo apt-get update
-          sudo apt-get install -y default-jre unzip wget
-          wget https://github.com/allure-framework/allure2/releases/download/2.35.1/allure-2.35.1.zip
-          unzip allure-2.35.1.zip -d /opt/allure
-          sudo ln -s /opt/allure/allure-2.35.1/bin/allure /usr/bin/allure
+          curl -X POST "${{ secrets.AAC_API_URL }}/api/ci/trigger" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ secrets.AAC_API_TOKEN }}" \
+          -d '{
+            "projectId": "${{ secrets.AAC_PROJECT_ID }}",
+            "image": "keinar101/my-automation-tests:latest",
+            "command": "Agnostic Execution Mode: Running [ui] via entrypoint.sh",
+            "folder": "tests/ui",
+            "config": {
+              "environment": "production",
+              "baseUrl": "${{ secrets.BASE_URL }}",
+              "retryAttempts": 2,
+              "envVars": {
+                "MONGO_URI": "${{ secrets.MONGO_URI }}"
+              }
+            },
+            "ciContext": {
+              "source": "github",
+              "repository": "${{ github.repository }}",
+              "prNumber": ${{ github.event.pull_request.number }}
+            }
+          }'
+          
+# name: Playwright Full-Stack Tests
 
-      - name: Restore history from gh-pages
-        run: |
-          echo "Starting history restoration..."
-          git fetch origin gh-pages || echo "Could not fetch gh-pages"
-          if git ls-tree -r origin/gh-pages --name-only | grep -q "^history/"; then
-            git checkout origin/gh-pages -- history
-            mkdir -p allure-results/history
-            cp -r history/* allure-results/history/
-          fi
+# on:
+#   push:
+#     branches: [ main, master ]
+#     paths-ignore:
+#       - 'README.md'
+#   pull_request:
+#     branches: [ main, master ]
+#     paths-ignore:
+#       - 'README.md'
 
-      - name: Generate Allure Report
-        run: allure generate allure-results --clean -o allure-report
+# jobs:
+#   # Job 1: Build and Publish to Docker Hub
+#   publish-docker:
+#     name: Build and Push Docker Image
+#     runs-on: ubuntu-latest
+#     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+      
+#       - name: Set up QEMU
+#         uses: docker/setup-qemu-action@v3
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report
-          publish_branch: gh-pages
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
 
-      - name: Comment PR with Allure Report link
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/`;
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.payload.pull_request.number,
-              body: `**Allure Report is ready!**\n\n ${reportUrl}`
-            });
+#       - name: Login to Docker Hub
+#         uses: docker/login-action@v3
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Add Action Summary
-        run: |
-          echo "## Allure Report" >> $GITHUB_STEP_SUMMARY
-          echo "**https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**" >> $GITHUB_STEP_SUMMARY
+#       - name: Build and push
+#         uses: docker/build-push-action@v5
+#         with:
+#           context: .
+#           platforms: linux/amd64,linux/arm64
+#           push: true
+#           tags: keinar101/my-automation-tests:latest
+
+#   # Job 2: Run QA Tests
+#   test:
+#     name: Run QA Tests (Docker)
+#     timeout-minutes: 60
+#     runs-on: ubuntu-latest
+#     container:
+#       image: mcr.microsoft.com/playwright:v1.57.0-jammy
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Cache npm dependencies
+#         uses: actions/cache@v4
+#         with:
+#           path: ~/.npm
+#           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+#           restore-keys: |
+#             ${{ runner.os }}-npm-
+
+#       - name: Install dependencies
+#         run: npm ci
+
+#       - name: Run Playwright tests
+#         env:
+#           BASE_URL: ${{ secrets.BASE_URL }}
+#           ADMIN_USER: ${{ secrets.ADMIN_USER }}
+#           ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+#           MONGO_URI: ${{ secrets.MONGO_URI }}
+#           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+#           HOME: /root
+#         run: npx playwright test
+
+#       - name: Upload Allure results
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: allure-results
+#           path: allure-results/
+#           retention-days: 3
+
+#   # Job 3: Deploy Allure Report to Pages
+#   deploy-report:
+#     name: Deploy Allure Report to Pages
+#     if: always()
+#     needs: test
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#       pull-requests: write
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Download Allure results
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: allure-results
+#           path: allure-results
+
+#       - name: Install Allure CLI
+#         run: |
+#           sudo apt-get update
+#           sudo apt-get install -y default-jre unzip wget
+#           wget https://github.com/allure-framework/allure2/releases/download/2.35.1/allure-2.35.1.zip
+#           unzip allure-2.35.1.zip -d /opt/allure
+#           sudo ln -s /opt/allure/allure-2.35.1/bin/allure /usr/bin/allure
+
+#       - name: Restore history from gh-pages
+#         run: |
+#           echo "Starting history restoration..."
+#           git fetch origin gh-pages || echo "Could not fetch gh-pages"
+#           if git ls-tree -r origin/gh-pages --name-only | grep -q "^history/"; then
+#             git checkout origin/gh-pages -- history
+#             mkdir -p allure-results/history
+#             cp -r history/* allure-results/history/
+#           fi
+
+#       - name: Generate Allure Report
+#         run: allure generate allure-results --clean -o allure-report
+
+#       - name: Deploy to GitHub Pages
+#         uses: peaceiris/actions-gh-pages@v3
+#         with:
+#           github_token: ${{ secrets.GITHUB_TOKEN }}
+#           publish_dir: ./allure-report
+#           publish_branch: gh-pages
+
+#       - name: Comment PR with Allure Report link
+#         if: github.event_name == 'pull_request'
+#         uses: actions/github-script@v7
+#         with:
+#           script: |
+#             const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/`;
+#             await github.rest.issues.createComment({
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               issue_number: context.payload.pull_request.number,
+#               body: `**Allure Report is ready!**\n\n ${reportUrl}`
+#             });
+
+#       - name: Add Action Summary
+#         run: |
+#           echo "## Allure Report" >> $GITHUB_STEP_SUMMARY
+#           echo "**https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/**" >> $GITHUB_STEP_SUMMARY
