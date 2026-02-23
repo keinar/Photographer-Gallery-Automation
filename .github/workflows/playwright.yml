@@ -53,7 +53,7 @@ jobs:
             "projectId": "${{ secrets.AAC_PROJECT_ID }}",
             "image": "keinar101/my-automation-tests:latest",
             "command": "Agnostic Execution Mode: Running [ui] via entrypoint.sh",
-            "folder": "tests/ui",
+            "folder": "tests",
             "config": {
               "environment": "production",
               "baseUrl": "${{ secrets.BASE_URL }}",
@@ -68,7 +68,7 @@ jobs:
               "prNumber": ${{ github.event.pull_request.number }}
             }
           }'
-          
+
 # name: Playwright Full-Stack Tests
 
 # on:
