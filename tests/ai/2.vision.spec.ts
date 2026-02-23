@@ -4,7 +4,8 @@ import * as fs from 'fs';
 
 test.describe('AI Vision Capabilities', () => {
     let aiHelper: AiHelper;
-
+    let galleryUrl = 'https://photo-gallery.keinar.com/gallery/xB4WC0tAs_';
+    
     test.beforeAll(async () => {
         aiHelper = new AiHelper();
     });
@@ -22,7 +23,7 @@ test.describe('AI Vision Capabilities', () => {
         };
 
         // 1. Navigate to the application
-        await page.goto('https://photo-gallery.keinar.com/gallery/xB4WC0tAs_');
+        await page.goto(galleryUrl);
 
         // 2. Wait for the gallery images to be visible
         await page.waitForSelector('main main img');
