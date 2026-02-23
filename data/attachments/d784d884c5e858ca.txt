@@ -1,0 +1,2 @@
+[2026-02-23T19:40:41.164Z] [INFO] API DELETE Request: /api/galleries/699cad38d66bf5bd4cf39498
+[2026-02-23T19:40:41.319Z] [INFO] API RAW Request: /api/galleries/public/vcDNUQTLp_
