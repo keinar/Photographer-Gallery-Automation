@@ -53,7 +53,7 @@ jobs:
             "projectId": "${{ secrets.AAC_PROJECT_ID }}",
             "image": "keinar101/my-automation-tests:latest",
             "command": "Agnostic Execution Mode: Running [ui] via entrypoint.sh",
-            "folder": "tests", 
+            "folder": "tests",
             "config": {
               "environment": "production",
               "baseUrl": "${{ secrets.BASE_URL }}",
