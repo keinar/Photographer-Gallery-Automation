@@ -70,7 +70,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           HOME: /root
           AGNOX_API_KEY: ${{ secrets.AGNOX_API_KEY }}
-          AGNOX_PROJECT_ID: ${{ secrets.AAC_PROJECT_ID }}
+          AGNOX_PROJECT_ID: ${{ secrets.AGNOX_PROJECT_ID }}
         run: npx playwright test
 
   deploy-report:
