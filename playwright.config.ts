@@ -1,5 +1,8 @@
 import { defineConfig, ReporterDescription } from '@playwright/test';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 const reporters: ReporterDescription[] = [
   ['list'],
   ['html', { outputFolder: 'playwright-report', open: 'never' }],
