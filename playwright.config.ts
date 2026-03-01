@@ -1,4 +1,23 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, ReporterDescription } from '@playwright/test';
+
+const reporters: ReporterDescription[] = [
+  ['list'],
+  ['html', { outputFolder: 'playwright-report', open: 'never' }],
+  ['allure-playwright', {
+    outputFolder: 'allure-results',
+    detail: true,
+    suiteTitle: false,
+    environmentInfo: { FRAMEWORK: 'Playwright' }
+  }]
+];
+
+if (process.env.AGNOX_API_KEY && process.env.AGNOX_PROJECT_ID) {
+  reporters.push(['@agnox/playwright-reporter', {
+    apiKey: process.env.AGNOX_API_KEY,
+    projectId: process.env.AGNOX_PROJECT_ID,
+    baseUrl: 'https://api.agnox.dev'
+  }]);
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -14,23 +33,14 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }],
-    ['allure-playwright', { 
-      outputFolder: 'allure-results',
-      detail: true,
-      suiteTitle: false,
-      environmentInfo: { FRAMEWORK: 'Playwright' }
-    }]
-  ],
+  reporter: reporters,
 
   timeout: 30 * 1000,
 
   expect: {
     timeout: 5000
   },
-// Global setup file to perform API login and save auth state
+  // Global setup file to perform API login and save auth state
   globalSetup: require.resolve('./global.setup.ts'),
 
   use: {
@@ -50,7 +60,7 @@ export default defineConfig({
     {
       name: 'ui-tests',
       testDir: './tests/ui',
-      use: { 
+      use: {
         browserName: 'chromium'
       },
     },
@@ -61,21 +71,21 @@ export default defineConfig({
     {
       name: 'e2e-tests',
       testDir: './tests/e2e',
-      use: { 
+      use: {
         browserName: 'chromium'
       },
     },
     {
       name: 'data-validation-tests',
       testDir: './tests/data',
-      use: { 
+      use: {
         browserName: 'chromium'
       },
     },
     {
       name: 'visual-tests',
       testDir: './tests/visual',
-      use: { 
+      use: {
         browserName: 'chromium',
         viewport: { width: 1920, height: 1080 },
         deviceScaleFactor: 1,
@@ -84,7 +94,7 @@ export default defineConfig({
     {
       name: 'ai-tests',
       testDir: './tests/ai',
-      use: { 
+      use: {
         browserName: 'chromium'
       },
     },
