@@ -38,6 +38,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@agnox/agnox-cli": "^2.0.10",
     "@google/generative-ai": "^0.24.1",
     "@types/uuid": "^10.0.0",
     "amqplib": "^0.10.9",
